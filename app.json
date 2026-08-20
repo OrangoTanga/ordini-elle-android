@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Ordini Elly Edition",
+    "slug": "ordini-elly-edition",
+    "version": "1.0.1",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#0B1120",
+      "resizeMode": "contain"
+    },
+    "android": {
+      "package": "com.ellyedition.ordini",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B1120"
+      }
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Consenti a Ordini di accedere alle tue foto per aggiungere immagini ai prodotti."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#00B4D8"
+        }
+      ]
+    ]
+  }
+}
