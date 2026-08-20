@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react'
+import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react'
+import { useFocusEffect } from '@react-navigation/native'
 import { View, Text, ScrollView, TextInput, Modal, RefreshControl, Platform, LayoutAnimation, UIManager, Dimensions } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LinearGradient } from 'expo-linear-gradient'
-import { Product, CATEGORIES, ProductCategory } from '../types'
+import { Product, CATEGORIES } from '../types'
 import { api } from '../services/api'
 import { cartStore } from '../store/cartStore'
 import { ProductCard } from '../components/ProductCard'
@@ -19,7 +20,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 const GRID_KEY = 'grid_columns'
 
-const CATEGORY_ICONS: Partial<Record<ProductCategory, string>> = {
+const CATEGORY_ICONS: Record<string, string> = {
   'vino bianco': '🥂',
   'vino rosso': '🍷',
   'prosecco': '🍾',
@@ -40,9 +41,9 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [gridCols, setGridCols] = useState(2)
+  const [categories, setCategories] = useState<string[]>(CATEGORIES)
 
   useEffect(() => {
-    loadProducts()
     AsyncStorage.getItem(GRID_KEY).then(v => {
       if (v === '4' || v === '3' || v === '2') {
         const n = parseInt(v)
@@ -50,7 +51,18 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ navigation }) => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
       }
     })
+    api.categories.list().then(res => {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setCategories(res.data.map(c => c.name))
+      }
+    })
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadProducts()
+    }, [])
+  )
 
   const loadProducts = async () => {
     setRefreshing(true)
@@ -69,20 +81,18 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ navigation }) => {
     })
   }, [products, search])
 
-  const categories = ['Tutti', ...CATEGORIES]
-
   const sections = useMemo(() => {
     const filteredByCat = selectedCat === 'Tutti'
       ? filtered
       : filtered.filter(p => p.category === selectedCat)
-    return CATEGORIES
+    return categories
       .map(cat => ({
         category: cat,
-        icon: CATEGORY_ICONS[cat] || '',
+        icon: CATEGORY_ICONS[cat] || '🏷️',
         products: filteredByCat.filter(p => p.category === cat),
       }))
       .filter(s => s.products.length > 0)
-  }, [filtered, selectedCat])
+  }, [filtered, selectedCat, categories])
 
   const renderProductGrid = (productsSlice: Product[], sectionIndex: number) => {
     const cols = gridCols
@@ -174,6 +184,11 @@ export const CatalogScreen: React.FC<CatalogScreenProps> = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={{ marginTop: 12 }}
           >
+            <CategoryChip
+              label="Tutti"
+              selected={selectedCat === 'Tutti'}
+              onPress={() => setSelectedCat('Tutti')}
+            />
             {categories.map(cat => (
               <CategoryChip
                 key={cat}

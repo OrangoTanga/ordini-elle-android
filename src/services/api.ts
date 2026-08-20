@@ -201,6 +201,11 @@ export const api = {
       fetchApi<any>(`/api/commission-exceptions/${id}`, { method: 'DELETE' }),
   },
 
+  categories: {
+    list: async () =>
+      fetchApi<{ id: number; name: string; sort_order: number }[]>('/api/categories'),
+  },
+
   productCommissionOverrides: {
     list: (productId: number) => fetchApi<any[]>(`/api/product-commission-overrides/${productId}`),
     update: (productId: number, overrides: { listino_id: number; commission_percent: number }[]) =>

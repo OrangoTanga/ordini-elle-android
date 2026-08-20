@@ -2,9 +2,9 @@ export type PaymentType = 'immediato' | 'anticipato' | 'dilazionato' | 'acconto_
 export type DocumentType = 'scontrino' | 'fattura'
 export type PaymentStatus = 'pending' | 'paid' | 'overdue' | 'partial'
 export type OrderStatus = 'pending' | 'approved' | 'rejected'
-export type ProductCategory = 'vino bianco' | 'vino rosso' | 'prosecco' | 'birre' | 'distillati' | 'extra' | ''
+export type ProductCategory = string
 
-export const CATEGORIES: ProductCategory[] = ['vino bianco', 'vino rosso', 'prosecco', 'birre', 'distillati', 'extra']
+export const CATEGORIES: string[] = ['vino bianco', 'vino rosso', 'prosecco', 'birre', 'distillati', 'extra']
 
 export interface User {
   id: number
