@@ -41,12 +41,14 @@ export const cartStore = {
     return () => { listeners.delete(listener) }
   },
 
-  addItem: (product: Product) => {
+  addItem: (product: Product, cartoni?: number) => {
+    const piecesPerCase = product.pieces_per_case || 1
+    const quantity = cartoni ? cartoni * piecesPerCase : 1
     const existing = state.items.find(i => i.product.id === product.id)
     if (existing) {
-      existing.quantity++
+      existing.quantity += quantity
     } else {
-      state.items.push({ product, quantity: 1 })
+      state.items.push({ product, quantity, pieces_per_case: piecesPerCase })
     }
     state = { ...state }
     notify()

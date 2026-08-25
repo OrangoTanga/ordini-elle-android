@@ -222,6 +222,7 @@ export const NewOrderScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         price: cartStore.getItemEffectivePrice(i),
         quantity: i.quantity,
         subtotal: cartStore.getItemEffectiveTotal(i),
+        pieces_per_case: i.pieces_per_case,
       })),
     }
 

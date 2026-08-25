@@ -7,15 +7,27 @@ import {
   removePendingOrder,
   getPendingCount,
 } from '../database/localDb'
+import { AppState, AppStateStatus } from 'react-native'
 
 const MAX_RETRIES = 50
-const RETRY_INTERVAL = 5 * 60 * 1000
+const RETRY_INTERVAL = 30 * 1000 // 30 seconds instead of 5 minutes
 
 let retryTimer: ReturnType<typeof setInterval> | null = null
 let onStatusChange: ((count: number, syncing: boolean) => void) | null = null
+let appStateListener: any = null
 
 export function setOnStatusChange(cb: typeof onStatusChange): void {
   onStatusChange = cb
+  if (!appStateListener) {
+    appStateListener = AppState.addEventListener('change', handleAppStateChange)
+  }
+}
+
+function handleAppStateChange(nextState: AppStateStatus) {
+  if (nextState === 'active') {
+    // App came to foreground - trigger immediate sync
+    retryAllOrders().then(notifyStatus)
+  }
 }
 
 export async function queueOrder(order: Omit<Order, 'id' | 'created_at' | 'updated_at' | 'user_id' | 'status'>): Promise<void> {
@@ -28,6 +40,17 @@ export async function queueOrder(order: Omit<Order, 'id' | 'created_at' | 'updat
   }
 
   await savePendingOrder(pendingOrder)
+  
+  // Try to send immediately
+  const healthOk = await api.health()
+  if (healthOk) {
+    const success = await trySendOrder(pendingOrder)
+    if (success) {
+      notifyStatus()
+      return
+    }
+  }
+  
   startRetryLoop()
   notifyStatus()
 }

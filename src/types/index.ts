@@ -33,12 +33,14 @@ export interface Product {
   image_path: string
   active: boolean
   listino_prices?: ListinoPrice[]
+  pieces_per_case?: number
 }
 
 export interface CartItem {
   product: Product
   quantity: number
   customPrice?: number
+  pieces_per_case?: number
 }
 
 export interface OrderItemCommission {
@@ -59,6 +61,7 @@ export interface OrderItem {
   subtotal: number
   commission_percent?: number
   commission?: number
+  pieces_per_case?: number
 }
 
 export interface Order {
