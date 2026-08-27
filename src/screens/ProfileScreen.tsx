@@ -8,7 +8,7 @@ import { GlassInput } from '../components/GlassInput'
 import { ConnectionIndicator } from '../components/ConnectionIndicator'
 import { authStore } from '../store/authStore'
 import { api } from '../services/api'
-import { getPendingCount, triggerManualSync } from '../services/offlineQueue'
+import { updateStore } from '../services/updateService'
 import { FadeInView } from '../components/FadeInView'
 import type { Customer } from '../types'
 
@@ -18,6 +18,8 @@ export const ProfileScreen: React.FC = () => {
   const { user } = authStore.getState()
   const [pendingCount, setPendingCount] = useState(0)
   const [syncing, setSyncing] = useState(false)
+  const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [updateInfo, setUpdateInfo] = useState<{ version: string; url: string } | null>(null)
   const [gridCols, setGridCols] = useState(2)
   const [customers, setCustomers] = useState<Customer[]>([])
   const [showCustomerForm, setShowCustomerForm] = useState(false)
@@ -53,6 +55,19 @@ export const ProfileScreen: React.FC = () => {
   const setGrid = (n: number) => {
     setGridCols(n)
     AsyncStorage.setItem(GRID_KEY, String(n))
+  }
+
+  const checkForUpdates = async () => {
+    setCheckingUpdate(true)
+    setUpdateInfo(null)
+    await updateStore.checkNow()
+    setTimeout(() => {
+      const state = updateStore.getState()
+      if (state.info && state.info.version) {
+        setUpdateInfo({ version: state.info.version, url: state.info.url || '' })
+      }
+      setCheckingUpdate(false)
+    }, 500)
   }
 
   const handleAddCustomer = async () => {
@@ -272,6 +287,12 @@ export const ProfileScreen: React.FC = () => {
                     variant="primary"
                     onPress={handleSync}
                     disabled={syncing}
+                  />
+                  <GlassButton
+                    title={checkingUpdate ? 'Verifica in corso...' : 'Verifica aggiornamenti'}
+                    variant="outline"
+                    onPress={checkForUpdates}
+                    disabled={checkingUpdate || syncing}
                   />
                   <GlassButton
                     title="Esci"

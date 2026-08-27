@@ -115,6 +115,10 @@ export const updateStore = {
     timer = setInterval(runCheck, CHECK_INTERVAL_MS)
   },
 
+  checkNow: async () => {
+    await runCheck()
+  },
+
   dismiss: () => {
     state = { ...state, dismissed: true }
     notify()
