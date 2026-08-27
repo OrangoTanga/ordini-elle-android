@@ -3,7 +3,7 @@
     "name": "Ordini Elly Edition",
     "slug": "ordini-elly-edition",
     "owner": "nerchio",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
