@@ -109,10 +109,12 @@ export const updateStore = {
   },
 
   init: async () => {
-    if (initialized) return
-    initialized = true
+    // Sempre controlla all'avvio, non solo la prima volta
     await runCheck()
-    timer = setInterval(runCheck, CHECK_INTERVAL_MS)
+    if (!initialized) {
+      initialized = true
+      timer = setInterval(runCheck, CHECK_INTERVAL_MS)
+    }
   },
 
   checkNow: async () => {
