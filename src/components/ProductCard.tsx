@@ -128,12 +128,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd }) => {
       </View>
     </Animated.View>
 
-    <Modal
-      visible={showCartoniModal}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={() => setShowCartoniModal(false)}
-    >
+    <>
+      <Modal
+        visible={showCartoniModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCartoniModal(false)}
+      >
       <View style={{
         flex: 1,
         backgroundColor: '#0B1120',
@@ -226,5 +227,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onAdd }) => {
         </View>
       </View>
     </Modal>
+    </>
   )
 }
